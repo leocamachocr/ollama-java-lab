@@ -3,7 +3,7 @@ plugins {
 }
 
 application {
-    mainClass = 'dev.leocamacho.ollamalab.rawapi.RawApiRunner'
+    mainClass = 'dev.leocamacho.ollamalab.rawapi.Main'
 }
 
 dependencies {

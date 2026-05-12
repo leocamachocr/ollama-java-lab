@@ -1,36 +1,78 @@
-<!-- ARCHIVO GENERADO — no editar directamente -->
-<!-- Editar shared/AGENT_CORE.md y ejecutar: python3 scripts/sync.py -->
-<!-- Hash fuente: f6aa3ba4 -->
+# CLAUDE.md
 
-# AGENT_CORE — ollama-java-lab
-
-## Estado del proyecto
-**Proyecto**: ollama-java-lab
-**Estado**: iteración 1 — raw-api-module implementado, módulos Spring AI y LangChain4j en scaffold
-**Última actualización**: 2026-05-05
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Propósito
 Laboratorio Java para experimentar con LLMs locales via Ollama. Objetivo principal: explorar
-generación de preguntas educativas y extracción de entidades usando el modelo `qwen2.5:7b`.
+generación de preguntas educativas, extracción de entidades y clasificación por embeddings
+usando los modelos `qwen2.5:7b` (chat) y `nomic-embed-text` (embeddings).
+
+## Comandos frecuentes
+
+```bash
+# Compilar todo el proyecto
+./gradlew build
+
+# Ejecutar el runner principal (requiere Ollama corriendo en localhost:11434)
+./gradlew :raw-api-module:run
+
+# Correr todos los tests (los de integración se saltan automáticamente si Ollama no está disponible)
+./gradlew test
+
+# Correr un test específico
+./gradlew :raw-api-module:test --tests "dev.leocamacho.ollamalab.rawapi.QuestionGeneratorIntegrationTest"
+
+# Compilar sin tests
+./gradlew assemble
+```
+
+## Arquitectura
+
+El proyecto es un monorepo Gradle con 4 módulos:
+
+- **`core`**: biblioteca sin framework. Define los records de dominio compartidos (`Question`, `Entity`, `EntityType`, `ExperimentResult<T>`) y depende solo de Jackson.
+- **`raw-api-module`**: implementación completa usando `java.net.http.HttpClient` puro. Punto de entrada: `RawApiRunner.main()`.
+- **`spring-ai-module`**: scaffold pendiente de implementación.
+- **`langchain4j-module`**: scaffold pendiente de implementación.
+
+### Flujo dentro de `raw-api-module`
+
+```
+Main
+    └── Example0N.run()
+            └── OllamaClient          ← toda la HTTP + JSON (de)serialización
+                    ├── chat()        → ChatResponse  (content, tokens, latencyMs)
+                    └── embed()       → List<Double>  (vector semántico)
+```
+
+Los `model/` records son los DTOs internos que usa `OllamaClient`; los ejemplos nunca los ven.
+
+### Ejemplos implementados
+
+| # | Clase | Endpoint |
+|---|-------|----------|
+| 01 | `Example01_QuestionGeneration` — JSON estructurado con `format: "json"` | `/api/chat` |
+| 02 | `Example02_EntityExtraction` — zero-shot vs few-shot vs chain-of-thought | `/api/chat` |
+| 03 | `Example03_EmbeddingClassification` — similitud coseno sobre vectores | `/api/embed` |
+
+`ExtractionStrategy` es un enum que lleva su propio system prompt; no hay switch externo.
 
 ## Dominio central
-- **Question**: pregunta de opción múltiple (4 opciones A–D, respuesta correcta)
-- **Entity**: entidad extraída de texto (PERSON, CONCEPT, TECHNOLOGY, DATE)
-- **ExperimentResult<T>**: resultado genérico con output, latencia, tokens y raw response
 
-## Módulos activos
-- `raw-api-module`: REST puro, implementado, punto de entrada principal
-- `spring-ai-module`: scaffold con dependencias, pendiente de implementación
-- `langchain4j-module`: scaffold con dependencias, pendiente de implementación
+- **`Question`** (core): pregunta de opción múltiple — 4 opciones A–D, campo `correct`
+- **`Entity`** (core): entidad extraída — `value` + `EntityType` (PERSON, CONCEPT, TECHNOLOGY, DATE)
+- **`ExperimentResult<T>`** (core): wrapper genérico para todos los experimentos
+- **`Category`** (raw-api-module): nombre + descripción + vector de embedding precalculado
 
 ## Convenciones de código
-- Java 21 con records para modelos de dominio
-- Arquitectura hexagonal: domain → application → infrastructure
-- Sin frameworks en `core/` (solo Jackson para serialización)
-- Tests de integración con `Assumptions.assumeTrue` para skip si Ollama no está disponible
+
+- Java 21 con records para todos los modelos de dominio
+- Arquitectura hexagonal: `domain` → `application` → `infrastructure`; `core/` sin frameworks
+- Tests de integración: `@BeforeAll` con `Assumptions.assumeTrue(isOllamaAvailable())` — se skipean si Ollama no responde
 
 ## Ollama
-- Host: `http://localhost:11434`
-- Modelo: `qwen2.5:7b`
-- Endpoint: `POST /api/chat` con `format: "json"` para output estructurado
-- `stream: false` en todos los experimentos de este lab
+
+- Host: `http://localhost:11434` (configurable via `ExperimentConfig`)
+- Modelo chat: `qwen2.5:7b` | Modelo embeddings: `nomic-embed-text`
+- Todos los requests usan `stream: false` y `format: "json"`
+- Timeout HTTP: 120s por request (los modelos locales son lentos)
