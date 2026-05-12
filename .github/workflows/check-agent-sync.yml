@@ -1,0 +1,30 @@
+# Verifica que CLAUDE.md y copilot-instructions.md estén sincronizados
+# con shared/AGENT_CORE.md. Falla si hay diferencias.
+name: Check agent sync
+
+on:
+  pull_request:
+    paths:
+      - 'shared/AGENT_CORE.md'
+      - 'CLAUDE.md'
+      - '.github/copilot-instructions.md'
+      - '.claude/commands/**'
+      - '.github/prompts/**'
+
+jobs:
+  check-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verificar sincronización del agente
+        run: python3 scripts/sync.py --check
+
+      - name: Verificar tamaño de copilot-instructions
+        run: |
+          SIZE=$(wc -c < .github/copilot-instructions.md)
+          echo "Tamaño: $SIZE chars"
+          if [ "$SIZE" -gt 12000 ]; then
+            echo "ERROR: copilot-instructions.md supera 12000 chars ($SIZE)"
+            exit 1
+          fi

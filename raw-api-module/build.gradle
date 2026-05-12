@@ -1,0 +1,12 @@
+plugins {
+    id 'application'
+}
+
+application {
+    mainClass = 'dev.leocamacho.ollamalab.rawapi.RawApiRunner'
+}
+
+dependencies {
+    implementation project(':core')
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.2'
+}

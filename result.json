@@ -1,0 +1,72 @@
+{
+  "entities": [
+    {
+      "value": "Spring Framework",
+      "type": "TECHNOLOGY"
+    },
+    {
+      "value": "Pivotal (now VMware)",
+      "type": "ORGANIZATION"
+    },
+    {
+      "value": "Rod Johnson",
+      "type": "PERSON"
+    },
+    {
+      "value": "2003",
+      "type": "DATE"
+    },
+    {
+      "value": "J2EE",
+      "type": "CONCEPT"
+    },
+    {
+      "value": "Dependency Injection (DI)",
+      "type": "CONCEPT"
+    },
+    {
+      "value": "Inversion of Control (IoC) principle",
+      "type": "CONCEPT"
+    },
+    {
+      "value": "Spring Boot",
+      "type": "TECHNOLOGY"
+    },
+    {
+      "value": "2014",
+      "type": "DATE"
+    },
+    {
+      "value": "Tomcat",
+      "type": "TECHNOLOGY"
+    },
+    {
+      "value": "2023",
+      "type": "DATE"
+    },
+    {
+      "value": "Spring Boot 3.x",
+      "type": "TECHNOLOGY"
+    },
+    {
+      "value": "GraalVM",
+      "type": "TECHNOLOGY"
+    },
+    {
+      "value": "instant startup times",
+      "type": "CONCEPT"
+    },
+    {
+      "value": "Spring Security",
+      "type": "TECHNOLOGY"
+    },
+    {
+      "value": "Spring Data",
+      "type": "TECHNOLOGY"
+    },
+    {
+      "value": "Spring Cloud",
+      "type": "TECHNOLOGY"
+    }
+  ]
+}

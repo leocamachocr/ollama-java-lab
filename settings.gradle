@@ -1,0 +1,6 @@
+rootProject.name = 'ollama-java-lab'
+
+include 'core'
+include 'raw-api-module'
+include 'spring-ai-module'
+include 'langchain4j-module'
